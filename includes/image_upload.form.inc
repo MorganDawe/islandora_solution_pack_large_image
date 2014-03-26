@@ -58,4 +58,5 @@ function islandora_large_image_image_upload_form_submit(array $form, array &$for
   $ds->setContentFromFile($path, FALSE);
   $ds->label = $file->filename;
   $ds->mimetype = $file->filemime;
+  file_delete($file);
 }
