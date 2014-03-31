@@ -125,7 +125,7 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     file_unmanaged_delete($uploaded_file);
     file_unmanaged_delete($derivative_file);
     if ($file) {
-      file_delete($file);
+      file_unmanaged_delete($file);
     }
     return $to_return;
   }
