@@ -37,6 +37,7 @@ function islandora_large_image_get_uploaded_file(AbstractObject $object) {
  *   TRUE if successful, FALSE otherwise.
  */
 function islandora_large_image_create_jp2_derivative(AbstractObject $object, $force = TRUE) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $base_name = str_replace(':', '-', $object->id);
   if ($force || !isset($object['JP2'])) {
     $to_return = array(
