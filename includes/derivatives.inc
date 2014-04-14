@@ -16,10 +16,14 @@
  *   The file path to the temp file if successful, FALSE otherwise.
  */
 function islandora_large_image_get_uploaded_file(AbstractObject $object) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $base_name = str_replace(':', '-', $object->id);
   $mime_detector = new MimeDetect();
   $ext = $mime_detector->getExtension($object['OBJ']->mimeType);
   $filename = file_create_filename("{$base_name}_OBJ.{$ext}", 'temporary://');
+  // Add temp file to the file managed table
+  islandora_temp_file_entry("{$base_name}_OBJ.{$ext}", $filename);
+
   $object['OBJ']->getContent($filename);
   return $filename;
 }
@@ -73,9 +77,12 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     }
 
     if ($kakadu) {
+      islandora_temp_file_delete($derivative_name);
       // Create JP2.
       if (!$lossless) {
         $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
+        $derivative_name = drupal_basename($derivative_file->uri);
+        islandora_temp_file_entry($derivative_name, $derivative_file->uri);
       }
       else {
         $derivative_file = islandora_large_image_kdu_compress(
@@ -83,6 +90,8 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
           "temporary://{$base_name}_JP2.jp2",
           'Creversible=yes -rate -,1,0.5,0.25 Clevels=5'
         );
+        $derivative_name = drupal_basename($derivative_file->uri);
+        islandora_temp_file_entry($derivative_name, $derivative_file->uri);
       }
       if ($derivative_file === FALSE) {
         $to_return['messages'][] = array(
@@ -100,6 +109,8 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
         "temporary://{$base_name}_JP2.jp2",
         islandora_large_image_get_args($lossless)
       );
+      $derivative_name = drupal_basename($derivative_file->uri);
+      islandora_temp_file_entry($derivative_name, $derivative_file->uri);
     }
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
@@ -130,11 +141,8 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       islandora_temp_file_delete($uploaded_file->uri);
     }
 
-    if (isset($derivative_file->uri)) {
-      $derivative_name = drupal_basename($derivative_file->uri);
-      islandora_temp_file_entry($derivative_name, $derivative_name);
-      islandora_temp_file_delete($derivative_name);
-    }
+    islandora_temp_file_delete($derivative_name);
+
     return $to_return;
   }
 }
@@ -160,6 +168,9 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
     );
 
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
+    $uploaded_name = drupal_basename($uploaded_file);
+    islandora_temp_file_entry($uploaded_name, $uploaded_file);
+
     $args = array();
     $args[] = '-resize ' . escapeshellarg("600 x 800");
     $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
@@ -189,12 +200,6 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
         );
       }
     }
-    $uploaded_name = drupal_basename($uploaded_file);
-    islandora_temp_file_entry($uploaded_name, $uploaded_file);
-
-    $derivative_name = drupal_basename($derivative_file);
-    islandora_temp_file_entry($derivative_name, $derivative_file);
-
     return $to_return;
   }
 }
@@ -220,6 +225,8 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
     );
 
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
+    $uploaded_name = drupal_basename($uploaded_file);
+    islandora_temp_file_entry($uploaded_name, $uploaded_file);
 
     $args = array();
     $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
@@ -250,11 +257,7 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
         );
       }
     }
-    $uploaded_name = drupal_basename($uploaded_file);
-    islandora_temp_file_entry($uploaded_name, $uploaded_file);
-
-    $derivative_name = drupal_basename($derivative_file);
-    islandora_temp_file_entry($derivative_name, $derivative_file);
+    islandora_temp_file_delete($uploaded_file);
     return $to_return;
   }
 }
@@ -298,11 +301,13 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
       $c_args[] = "-compress None";
     }
     $c_dest = file_create_filename(drupal_basename($src) . ".tif", 'temporary://');
+    $derivative_name = drupal_basename($c_dest);
+    islandora_temp_file_entry($derivative_name, $c_dest);
+
     $src = islandora_large_image_imagemagick_convert($src, $c_dest, $c_args);
     $unlink_source = TRUE;
 
-    $derivative_name = drupal_basename($c_dest);
-    islandora_temp_file_entry($derivative_name, $c_dest);
+
   }
   // Default args.
   $args = isset($args) ? $args : '-rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes';
