@@ -46,6 +46,10 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     );
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
 
+    $uploaded_name = drupal_basename($uploaded_file);
+    islandora_temp_file_entry($uploaded_name, $uploaded_file);
+
+
     // Create JP2 with kakadu.
     module_load_include('inc', 'islandora_large_image', 'includes/utilities');
     $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
@@ -123,15 +127,14 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
         );
       }
     }
-    $uploaded_name = drupal_basename($uploaded_file);
-    islandora_temp_file_entry($uploaded_name, $uploaded_file);
+    if (isset($uploaded_file->uri)) {
+      islandora_temp_file_delete($uploaded_file->uri);
+    }
 
-    $derivative_name = drupal_basename($derivative_file);
-    islandora_temp_file_entry($derivative_name, $derivative_file);
-
-    if ($file) {
-      $file_name = drupal_basename($file);
-      islandora_temp_file_entry($file_name, $file);
+    if (isset($derivative_file->uri)) {
+      $derivative_name = drupal_basename($derivative_file->uri);
+      islandora_temp_file_entry($derivative_name, $derivative_name);
+      islandora_temp_file_delete($derivative_name);
     }
     return $to_return;
   }
