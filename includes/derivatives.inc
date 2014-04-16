@@ -122,15 +122,12 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
         );
       }
     }
-    $uploaded_name = drupal_basename($uploaded_file);
-    islandora_temp_file_entry($uploaded_name, $uploaded_file);
+    islandora_temp_file_entry($uploaded_file);
 
-    $derivative_name = drupal_basename($derivative_file);
-    islandora_temp_file_entry($derivative_name, $derivative_file);
+    islandora_temp_file_entry($derivative_file);
 
     if ($file) {
-      $file_name = drupal_basename($file);
-      islandora_temp_file_entry($file_name, $file);
+      islandora_temp_file_entry($file);
     }
     return $to_return;
   }
@@ -186,11 +183,9 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
         );
       }
     }
-    $uploaded_name = drupal_basename($uploaded_file);
-    islandora_temp_file_entry($uploaded_name, $uploaded_file);
+    islandora_temp_file_entry($uploaded_file);
 
-    $derivative_name = drupal_basename($derivative_file);
-    islandora_temp_file_entry($derivative_name, $derivative_file);
+    islandora_temp_file_entry($derivative_file);
 
     return $to_return;
   }
@@ -247,11 +242,8 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
         );
       }
     }
-    $uploaded_name = drupal_basename($uploaded_file);
-    islandora_temp_file_entry($uploaded_name, $uploaded_file);
-
-    $derivative_name = drupal_basename($derivative_file);
-    islandora_temp_file_entry($derivative_name, $derivative_file);
+    islandora_temp_file_entry($uploaded_file);
+    islandora_temp_file_entry($derivative_file);
     return $to_return;
   }
 }
