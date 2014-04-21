@@ -302,10 +302,8 @@ function islandora_large_image_kdu_compress($src, $dest, $args = NULL) {
       $c_args[] = "-compress None";
     }
     $c_dest = file_create_filename(drupal_basename($src) . ".tif", 'temporary://');
-    //islandora_temp_file_entry($c_dest);
     $src = islandora_large_image_imagemagick_convert($src, $c_dest, $c_args);
     $unlink_source = TRUE;
-    //islandora_temp_file_delete($c_dest);
   }
   // Default args.
   $args = isset($args) ? $args : '-rate 0.5 Clayers=1 Clevels=7 "Cprecincts={256,256},{256,256},{256,256},{128,128},{128,128},{64,64},{64,64},{32,32},{16,16}" "Corder=RPCL" "ORGgen_plt=yes" "ORGtparts=R" "Cblk={32,32}" Cuse_sop=yes';
