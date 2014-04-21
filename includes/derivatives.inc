@@ -49,7 +49,6 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
       'messages' => array(),
     );
     $uploaded_file = islandora_large_image_get_uploaded_file($object);
-    //islandora_temp_file_entry($uploaded_file);
     // Create JP2 with kakadu.
     module_load_include('inc', 'islandora_large_image', 'includes/utilities');
     $kakadu = variable_get('islandora_use_kakadu', !islandora_large_image_check_imagemagick_for_jpeg2000());
