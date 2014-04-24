@@ -16,7 +16,6 @@
  *   The file path to the temp file if successful, FALSE otherwise.
  */
 function islandora_large_image_get_uploaded_file(AbstractObject $object) {
-  module_load_include('inc', 'islandora', 'includes/utilities');
   $base_name = str_replace(':', '-', $object->id);
   $mime_detector = new MimeDetect();
   $ext = $mime_detector->getExtension($object['OBJ']->mimeType);
@@ -72,18 +71,19 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
 
     if ($kakadu) {
       $temp_file = NULL;
+      $temp_uri = "temporary://{$base_name}_JP2.jp2";
       // Create JP2.
       if (!$lossless) {
-        $derivative_file = islandora_large_image_kdu_compress($uploaded_file, "temporary://{$base_name}_JP2.jp2");
-        $temp_file = islandora_temp_file_entry("temporary://{$base_name}_JP2.jp2");
+        $derivative_file = islandora_large_image_kdu_compress($uploaded_file, $temp_uri);
+        $temp_file = islandora_temp_file_entry($temp_uri);
       }
       else {
         $derivative_file = islandora_large_image_kdu_compress(
           $uploaded_file,
-          "temporary://{$base_name}_JP2.jp2",
+          $temp_uri,
           'Creversible=yes -rate -,1,0.5,0.25 Clevels=5'
         );
-        $temp_file = islandora_temp_file_entry("temporary://{$base_name}_JP2.jp2");
+        $temp_file = islandora_temp_file_entry($temp_uri);
       }
       if ($derivative_file === FALSE) {
         $to_return['messages'][] = array(
@@ -98,10 +98,10 @@ function islandora_large_image_create_jp2_derivative(AbstractObject $object, $fo
     if (!$kakadu) {
       $derivative_file = islandora_large_image_imagemagick_convert(
         $uploaded_file,
-        "temporary://{$base_name}_JP2.jp2",
+        $temp_uri,
         islandora_large_image_get_args($lossless)
       );
-      $temp_file = islandora_temp_file_entry("temporary://{$base_name}_JP2.jp2");
+      $temp_file = islandora_temp_file_entry($temp_uri);
     }
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
