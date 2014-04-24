@@ -164,8 +164,9 @@ function islandora_large_image_create_jpg_derivative(AbstractObject $object, $fo
     $args = array();
     $args[] = '-resize ' . escapeshellarg("600 x 800");
     $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
-    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_JPG.jpg", $args);
-    $temp_derivative_file = islandora_temp_file_entry("temporary://{$base_name}_JPG.jpg");
+    $temp_uri = "temporary://{$base_name}_JPG.jpg";
+    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, $temp_uri, $args);
+    $temp_derivative_file = islandora_temp_file_entry($temp_uri);
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
         'message' => t('Failed to create JPG derivative.'),
