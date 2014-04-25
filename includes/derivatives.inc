@@ -226,8 +226,9 @@ function islandora_large_image_create_tn_derivative(AbstractObject $object, $for
     $args = array();
     $args[] = '-quality ' . escapeshellarg(variable_get('imagemagick_quality', 75));
     $args[] = '-resize ' . escapeshellarg("200 x 200");
-    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, "temporary://{$base_name}_TN.jpg", $args);
-    $temp_derivative_file = islandora_temp_file_entry("temporary://{$base_name}_TN.jpg");
+    $temp_uri = "temporary://{$base_name}_TN.jpg";
+    $derivative_file = islandora_large_image_imagemagick_convert($uploaded_file, $temp_uri, $args);
+    $temp_derivative_file = islandora_temp_file_entry($temp_uri);
     if ($derivative_file === FALSE) {
       $to_return['messages'][] = array(
         'message' => t('Failed to create TN derivative.'),
